@@ -62,7 +62,7 @@ func main() {
 	}
 }
 
-func addCommentsIfMissing(filename string, completion *Completion) error {
+func addCommentsIfMissing(filename string, completion Completion) error {
 	fset := token.NewFileSet()
 	node, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
@@ -98,17 +98,23 @@ func addCommentsIfMissing(filename string, completion *Completion) error {
 	node.Comments = comments
 
 	// write new ast to file
-	WriteFile(filename, fset, node)
-
+	err = WriteFile(filename, fset, node)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return nil
 }
 
-func WriteFile(filename string, fset *token.FileSet, content *ast.File) {
+func WriteFile(filename string, fset *token.FileSet, content *ast.File) error {
 	// write new ast to file
-	f, _ := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
 	defer f.Close()
 
 	if err := printer.Fprint(f, fset, content); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }

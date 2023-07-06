@@ -12,17 +12,28 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-type Completion struct {
-	client *openai.Client
+type Completion interface {
+	CreateComment(fset *token.FileSet, funcDecl *ast.FuncDecl) string
 }
 
-func NewCompletion(key string) *Completion {
-	return &Completion{
+type completion struct {
+	client Client
+}
+
+type Client interface {
+	CreateChatCompletion(
+		ctx context.Context,
+		request openai.ChatCompletionRequest,
+	) (response openai.ChatCompletionResponse, err error)
+}
+
+func NewCompletion(key string) Completion {
+	return &completion{
 		client: openai.NewClient(key),
 	}
 }
 
-func (c *Completion) CreateComment(fset *token.FileSet, funcDecl *ast.FuncDecl) string {
+func (c *completion) CreateComment(fset *token.FileSet, funcDecl *ast.FuncDecl) string {
 	buf := new(bytes.Buffer)
 
 	printer.Fprint(buf, fset, funcDecl)
@@ -51,7 +62,7 @@ func (c *Completion) CreateComment(fset *token.FileSet, funcDecl *ast.FuncDecl) 
 	return c.generateComment(tpl.String())
 }
 
-func (c *Completion) generateComment(input string) string {
+func (c *completion) generateComment(input string) string {
 	msgs := []openai.ChatCompletionMessage{{
 		Role:    openai.ChatMessageRoleUser,
 		Content: input,
