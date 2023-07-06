@@ -16,7 +16,7 @@ Replace your-api-key with your actual OpenAI API key.
 
 You can install AutoDocs directly using the go install command:
 ```bash
-go install github.com/yourusername/autodocs@latest
+go install github.com/tbuchaillot/autodocs@latest
 ```
 
 This will download the source code, compile it, and move the autodocs executable to $GOPATH/bin.
