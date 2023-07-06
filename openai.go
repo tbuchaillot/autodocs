@@ -52,7 +52,7 @@ func (c *Completion) CreateComment(fset *token.FileSet, funcDecl *ast.FuncDecl) 
 }
 
 func (c *Completion) generateComment(input string) string {
-	msgs := []openai.ChatCompletionMessage{openai.ChatCompletionMessage{
+	msgs := []openai.ChatCompletionMessage{{
 		Role:    openai.ChatMessageRoleUser,
 		Content: input,
 	}}
